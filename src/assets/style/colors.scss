@@ -1,0 +1,12 @@
+:root {
+  --color-white: #ffffff;
+  --color-red: #CD3369;
+  --color-bright-red: #FFBABF;
+  --color-disabled: #282828;
+  --color-modal: #020101;
+  --color-bright-green: #D2FFBA;
+  --color-green: #7BCD33;
+
+  --shadow-text-red: var(--color-red) 0 0 48px;
+  --shadow-text-green: var(--color-green) 0 0 48px;
+}
