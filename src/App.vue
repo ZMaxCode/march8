@@ -2,7 +2,7 @@
   <div class="main">
     <Timer
         class="main__timer"
-        :target-date="new Date('2025-03-02T12:06:00')"
+        :target-date="new Date('2025-03-07T18:00:00')"
         :is-active="isTimerActive"
         @finished="onTimerFinish"
     />
