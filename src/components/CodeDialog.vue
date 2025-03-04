@@ -2,14 +2,15 @@
   <div
       class="dialog"
       :class="{
-        'dialog--visible': isVisible
+        'dialog--visible': isVisible,
       }"
   >
     <div class="dialog__back"/>
     <div
         class="dialog__main"
         :class="{
-          'dialog__main--success': isCodeCorrect
+          'dialog__main--success': isCodeCorrect,
+          'dialog__main--shake': hasShakeAnimation
         }"
     >
       <template v-if="status === 'process'">
@@ -25,20 +26,34 @@
             v-maska:unmaskedValue.unmasked="'##### ##### ##### ##### #####'"
             v-model="maskedValue"
         />
-        <Button
-          v-if="!isCodeCorrect"
-          :disabled="unmaskedValue.length !== 25"
-          class="dialog__code-button"
-          @click="handleEnterCode"
-        >
-          Ввести код
-        </Button>
-        <span
-            v-else
-            class="dialog__success-message"
-        >
-          Устройство обезврежено!
-        </span>
+        <div class="dialog__footer">
+          <template v-if="!isCodeCorrect">
+            <template v-if="repeatCount">
+              <Button
+                  :disabled="unmaskedValue.length !== 25"
+                  class="dialog__code-button"
+                  @click="handleEnterCode"
+              >
+                Ввести код
+              </Button>
+              <span class="dialog__repeat-count text-red-shadow">
+                Осталось попыток: {{ repeatCount }}
+              </span>
+            </template>
+            <span
+                v-else
+                class="text-red-shadow dialog__failed-message"
+            >
+              Попытки окончены!
+            </span>
+          </template>
+          <span
+              v-else
+              class="dialog__success-message"
+          >
+            Устройство обезврежено!
+          </span>
+        </div>
       </template>
       <template v-if="status === 'completed'">
         <h3 class="dialog__title">
@@ -57,7 +72,7 @@
 <script>
 import CrossIcon from '/src/assets/icons/cross.svg';
 import Button from "./Button.vue";
-import { vMaska } from "maska/vue"
+import {vMaska} from "maska/vue"
 
 export default {
   name: "CodeDialog",
@@ -81,6 +96,23 @@ export default {
       unmaskedValue: "",
       maskedValue: "",
       isCodeCorrect: false,
+      repeatCount: 3,
+      hasShakeAnimation: false,
+    }
+  },
+  watch: {
+    repeatCount(val) {
+      this.hasShakeAnimation = true;
+
+      setTimeout(() => {
+        this.hasShakeAnimation = false;
+      }, 500)
+
+      if(val) return;
+
+      setTimeout(() => {
+        this.$emit('update:status', 'failed');
+      }, 3500);
     }
   },
   methods: {
@@ -88,7 +120,7 @@ export default {
       this.isModalVisible = false;
     },
     handleEnterCode() {
-      if(this.unmaskedValue !== this.code) this.handleCodeError()
+      if (this.unmaskedValue !== this.code) this.handleCodeError()
       else this.handleCodeSuccess();
     },
     handleCodeSuccess() {
@@ -98,7 +130,7 @@ export default {
       }, 3000);
     },
     handleCodeError() {
-      console.log('error')
+      this.repeatCount--;
     }
   },
   mounted() {
@@ -108,90 +140,120 @@ export default {
 </script>
 
 <style lang="scss">
-  .dialog {
-    @include transition(visibility, opacity);
+.dialog {
+  @include transition(visibility, opacity);
 
-    position: fixed;
-    visibility: hidden;
-    opacity: 0;
+  position: fixed;
+  visibility: hidden;
+  opacity: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 2;
+
+  &--visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  &__back {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 100vh;
+    height: 100%;
+    background: var(--color-modal);
+    opacity: 0.6;
+  }
+
+  &__main {
+    --text-color: var(--color-bright-red);
+    --text-shadow: var(--shadow-text-red);
+    --tx: -50%;
+    --ty: -50%;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(var(--tx), var(--ty));
+    background: var(--color-modal);
+    padding: 64px;
     z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80%;
+    gap: 48px;
 
-    &--visible {
-      opacity: 1;
-      visibility: visible;
+    &--success {
+      --text-color: var(--color-bright-green);
+      --text-shadow: var(--shadow-text-green);
     }
 
-    &__back {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--color-modal);
-      opacity: 0.6;
+    &--shake {
+      animation: shake 0.5s ease-in-out;
     }
 
-    &__main {
-      --text-color: var(--color-bright-red);
-      --text-shadow: var(--shadow-text-red);
-
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: var(--color-modal);
-      padding: 64px;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 80%;
-      gap: 48px;
-
-      &--success {
-        --text-color: var(--color-bright-green);
-        --text-shadow: var(--shadow-text-green);
-      }
-    }
-
-    &__title {
-      @include transition(color);
-
-      font-size: 96px;
-      text-align: center;
-      color: var(--text-color);
-      text-shadow: var(--shadow-text-red);
-    }
-
-    &__close {
-      position: absolute;
-      padding: 30px;
-      top: 0;
-      right: 0;
-
-      &-icon {
-        width: 24px;
-        height: 24px;
-        fill: white;
-      }
-    }
-
-    &__code-input {
-      @include transition(color, text-shadow);
-
-      font-size: 56px;
-      text-align: center;
-      width: 100%;
-      color: var(--text-color);
-      text-shadow: var(--text-shadow);
-    }
-
-    &__success-message {
-      font-size: 48px;
-      color: var(--text-color);
-      text-shadow: var(--shadow-text-red);
+    @keyframes shake {
+      0% { transform: translate(var(--tx), var(--ty)); }
+      10% { transform: translate(calc(var(--tx) - 10px), calc(var(--ty) - 10px)); }
+      20% { transform: translate(calc(var(--tx) + 10px), calc(var(--ty) + 10px)); }
+      30% { transform: translate(calc(var(--tx) - 10px), calc(var(--ty) + 10px)); }
+      40% { transform: translate(calc(var(--tx) + 10px), calc(var(--ty) - 10px)); }
+      50% { transform: translate(calc(var(--tx) - 10px), calc(var(--ty) - 10px)); }
+      60% { transform: translate(calc(var(--tx) + 10px), calc(var(--ty) + 10px)); }
+      70% { transform: translate(calc(var(--tx) - 10px), calc(var(--ty) + 10px)); }
+      80% { transform: translate(calc(var(--tx) + 10px), calc(var(--ty) - 10px)); }
+      90% { transform: translate(calc(var(--tx) - 10px), calc(var(--ty) - 10px)); }
+      100% { transform: translate(var(--tx), var(--ty)); }
     }
   }
+
+  &__title {
+    @include transition(color);
+
+    font-size: 96px;
+    text-align: center;
+    color: var(--text-color);
+    text-shadow: var(--shadow-text-red);
+  }
+
+  &__close {
+    position: absolute;
+    padding: 30px;
+    top: 0;
+    right: 0;
+
+    &-icon {
+      width: 24px;
+      height: 24px;
+      fill: white;
+    }
+  }
+
+  &__code-input {
+    @include transition(color, text-shadow);
+
+    font-size: 56px;
+    text-align: center;
+    width: 100%;
+    color: var(--text-color);
+    text-shadow: var(--text-shadow);
+  }
+
+  &__success-message {
+    font-size: 48px;
+    color: var(--text-color);
+    text-shadow: var(--shadow-text-red);
+  }
+
+  &__failed-message {
+    font-size: 48px;
+  }
+
+  &__repeat-count {
+    margin: 16px auto 0;
+    display: flex;
+    justify-content: center;
+  }
+}
 </style>

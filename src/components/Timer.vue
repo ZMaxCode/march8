@@ -53,7 +53,7 @@ export default {
       }
     },
     isActive(newVal) {
-      if(!newVal) return;
+      if(newVal) return;
       clearInterval(this.intervalId);
     }
   },
