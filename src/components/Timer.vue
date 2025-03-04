@@ -83,6 +83,7 @@ export default {
     --separate-opacity: 1;
 
     font-size: 56px;
+    width: max-content;
 
     &--blinking {
       --separate-opacity: 0.5;
@@ -94,6 +95,10 @@ export default {
       display: inline-block;
       opacity: var(--separate-opacity);
       transform: translateY(-4px);
+    }
+
+    @media screen and (max-width: 768px) {
+      font-size: 48px;
     }
   }
 </style>

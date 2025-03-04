@@ -254,6 +254,10 @@ export default {
     width: 100%;
     color: var(--text-color);
     text-shadow: var(--text-shadow);
+
+    @media screen and (max-width: 1500px) {
+      font-size: 40px;
+    }
   }
 
   &__success-message {
