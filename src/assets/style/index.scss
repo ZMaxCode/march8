@@ -1,3 +1,7 @@
 @import "typography";
 @import "reset";
 @import "colors";
+
+*:focus {
+  outline: 1px solid blue;
+}

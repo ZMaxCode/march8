@@ -15,6 +15,7 @@
     <Button
         class="main__button"
         @click="showModal"
+        v-if="hasCodeButton"
     >
       Ввести код
     </Button>
@@ -36,6 +37,11 @@ export default {
       isTimerActive: true,
     }
   },
+  computed: {
+    hasCodeButton() {
+      return window.location.hash === '#code'
+    }
+  },
   methods: {
     showModal() {
       this.isModalVisible = true;
@@ -46,7 +52,7 @@ export default {
     onTimerFinish() {
       this.currentStatus = 'failed';
       this.isModalVisible = true;
-    }
+    },
   }
 }
 </script>

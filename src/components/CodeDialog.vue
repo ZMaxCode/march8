@@ -26,6 +26,8 @@
             v-maska:unmaskedValue.unmasked="'##### ##### ##### ##### #####'"
             v-model="maskedValue"
             @keydown.enter="!isEnterCodeDisabled && handleEnterCode()"
+            placeholder="_____ _____ _____ _____ _____"
+            :disabled="!repeatCount"
         />
         <div class="dialog__footer">
           <template v-if="!isCodeCorrect">
@@ -119,6 +121,12 @@ export default {
       setTimeout(() => {
         this.$emit('update:status', 'failed');
       }, 3500);
+    },
+    isVisible(val) {
+      if(!val) return;
+      setTimeout(() => {
+        this.$refs.codeInput.focus();
+      }, 300)
     }
   },
   methods: {
@@ -131,6 +139,8 @@ export default {
     },
     handleCodeSuccess() {
       this.isCodeCorrect = true;
+      this.$refs.codeInput.blur();
+
       setTimeout(() => {
         this.$emit('update:status', 'completed');
       }, 3000);
