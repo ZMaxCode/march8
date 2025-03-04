@@ -25,12 +25,13 @@
             class="dialog__code-input"
             v-maska:unmaskedValue.unmasked="'##### ##### ##### ##### #####'"
             v-model="maskedValue"
+            @keydown.enter="!isEnterCodeDisabled && handleEnterCode()"
         />
         <div class="dialog__footer">
           <template v-if="!isCodeCorrect">
             <template v-if="repeatCount">
               <Button
-                  :disabled="unmaskedValue.length !== 25"
+                  :disabled="isEnterCodeDisabled"
                   class="dialog__code-button"
                   @click="handleEnterCode"
               >
@@ -98,6 +99,11 @@ export default {
       isCodeCorrect: false,
       repeatCount: 3,
       hasShakeAnimation: false,
+    }
+  },
+  computed: {
+    isEnterCodeDisabled() {
+      return this.unmaskedValue.length !== 25;
     }
   },
   watch: {
