@@ -2,12 +2,12 @@
   <div class="main">
     <Timer
         class="main__timer"
-        :target-date="new Date('2025-03-07T18:00:00')"
+        :target-date="new Date('2025-03-07T20:00:00')"
         :is-active="isTimerActive"
         @finished="onTimerFinish"
     />
     <CodeDialog
-      code="1111111111111111111111111"
+      code="4719265830471583692046752"
       v-model:is-visible="isModalVisible"
       v-model:status="currentStatus"
       @update:status="stopTimer"

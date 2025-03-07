@@ -114,9 +114,12 @@ export default {
 
       setTimeout(() => {
         this.hasShakeAnimation = false;
-      }, 500)
+      }, 500);
 
-      if(val) return;
+      if(val) {
+        this.$refs.codeInput.focus();
+        return;
+      }
 
       setTimeout(() => {
         this.$emit('update:status', 'failed');
